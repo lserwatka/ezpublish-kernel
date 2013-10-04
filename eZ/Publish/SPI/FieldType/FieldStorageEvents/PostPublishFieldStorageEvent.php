@@ -7,7 +7,7 @@
  * @version //autogentag//
  */
 
-namespace eZ\Publish\SPI\FieldType\Events;
+namespace eZ\Publish\SPI\FieldType\FieldStorageEvents;
 
 use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 

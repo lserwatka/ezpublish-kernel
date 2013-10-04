@@ -15,6 +15,9 @@ use eZ\Publish\Core\IO\IOService;
 use eZ\Publish\Core\FieldType\GatewayBasedStorage;
 use eZ\Publish\Core\IO\MetadataHandler;
 use eZ\Publish\Core\Base\Exceptions\NotFoundException;
+use eZ\Publish\SPI\FieldType\Event as FieldTypeEvent;
+use eZ\Publish\SPI\FieldType\EventListener as FieldTypeEventListener;
+use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
 
 /**
  * Converter for Image field type external storage
@@ -23,7 +26,7 @@ use eZ\Publish\Core\Base\Exceptions\NotFoundException;
  * $field->value->externalData. $field->value->data is simply empty, because no
  * internal data is store.
  */
-class ImageStorage extends GatewayBasedStorage
+class ImageStorage extends GatewayBasedStorage implements FieldTypeEventListener
 {
     /**
      * The IO Service used to manipulate data
@@ -312,5 +315,24 @@ class ImageStorage extends GatewayBasedStorage
     {
         // @todo: Correct?
         return null;
+    }
+
+    public function handleEvent( FieldTypeEvent $event )
+    {
+        if ( !$event instanceof PostPublishFieldStorageEvent )
+            return;
+
+        // get new path from PathGenerator, and compare to currently stored path
+        $publishedPath = $this->pathGenerator->getStoragePathForField(
+            $event->field->id,
+            $event->versionInfo->versionNo,
+            $event->field->languageCode,
+            ''
+        );
+
+        if ( $publishedPath != $event->field->value->data['id'] )
+        {
+            // @todo update stored path and reference if applicable
+        }
     }
 }
