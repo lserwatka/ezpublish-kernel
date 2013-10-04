@@ -1508,7 +1508,7 @@ class ContentService implements ContentServiceInterface
     public function publishVersion( APIVersionInfo $versionInfo )
     {
         $content = $this->internalLoadContent(
-            $versionInfo->contentInfo->id,
+            $versionInfo->getContentInfo()->id,
             null,
             $versionInfo->versionNo
         );

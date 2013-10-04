@@ -720,6 +720,66 @@ class ContentTest extends BaseServiceMockTest
     }
 
     /**
+     * @covers eZ\Publish\Core\Repository\ContentService::publishVersion()
+     */
+    public function testPublishVersion()
+    {
+        $repository = $this->getRepositoryMock();
+
+        $contentService = $this->getPartlyMockedContentService( array( "internalLoadContent", "internalPublishVersion" ) );
+
+        /** @var Content|\PHPUnit_Framework_MockObject_MockObject $contentMock */
+        $contentMock = $this->getMock( 'eZ\\Publish\\API\\Repository\Values\\Content\\Content' );
+
+        $contentService->expects( $this->once() )
+            ->method( 'internalLoadContent' )
+            ->with()
+            ->will( $this->returnValue( $contentMock ) );
+
+        /** @var VersionInfo|\PHPUnit_Framework_MockObject_MockObject $versionInfoMock */
+        $versionInfoMock = $this->getMock( 'eZ\\Publish\\API\\Repository\\Values\\Content\\VersionInfo' );
+        /** @var ContentInfo|\PHPUnit_Framework_MockObject_MockObject $contentInfoMock */
+        $contentInfoMock = $this->getMock( 'eZ\\Publish\\API\\Repository\\Values\\Content\\ContentInfo' );
+
+        $contentMock->expects( $this->any() )
+            ->method( 'getVersionInfo' )
+            ->will( $this->returnValue( $versionInfoMock ) );
+
+        $versionInfoMock->expects( $this->any() )
+            ->method( 'getContentInfo' )
+            ->will( $this->returnValue( $contentInfoMock ) );
+
+        $getMap = array(
+            array( 'published', false ),
+            array( 'id' => 0 )
+        );
+        $contentInfoMock->expects( $this->any() )
+            ->method( '__get' )
+            ->will( $this->returnValueMap( $getMap ) );
+
+        $repository->expects( $this->once() )
+            ->method( "canUser" )
+            ->with( "content", "create" )
+            ->will( $this->returnValue( true ) );
+
+        $repository->expects( $this->once() )
+            ->method( 'beginTransaction' );
+
+        $contentService->expects( $this->once() )
+            ->method( 'internalPublishVersion' )
+            ->with( $versionInfoMock )
+            ->will( $this->returnValue( $contentMock ) );
+
+        $repository->expects( $this->once() )
+            ->method( 'commit' );
+
+        self::assertEquals(
+            $contentMock,
+            $contentService->publishVersion( $versionInfoMock )
+        );
+    }
+
+    /**
      * @param string $mainLanguageCode
      * @param \eZ\Publish\API\Repository\Values\Content\Field[] $structFields
      * @param \eZ\Publish\API\Repository\Values\ContentType\FieldDefinition[] $fieldDefinitions
