@@ -110,4 +110,16 @@ interface FieldStorage
      * @return \eZ\Publish\SPI\Persistence\Content\Search\Field[]
      */
     public function getIndexData( VersionInfo $versionInfo, Field $field, array $context );
+
+    /**
+     * Handles storage event $event on $field in $versionInfo
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param FieldStorageEvent $event
+     * @param array $context
+     *
+     * @return void
+     */
+    public function handleEvent( VersionInfo $versionInfo, Field $field, FieldStorageEvent $event, array $context );
 }

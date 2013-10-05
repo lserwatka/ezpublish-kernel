@@ -10,6 +10,7 @@
 namespace eZ\Publish\Core\FieldType;
 
 use eZ\Publish\SPI\FieldType\FieldStorage;
+use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content\VersionInfo;
 use eZ\Publish\SPI\Persistence\Content\Field;
 
@@ -75,6 +76,11 @@ class NullStorage implements FieldStorage
      * @return null|boolean Same as {@link \eZ\Publish\SPI\FieldType\FieldStorage::storeFieldData()}.
      */
     public function copyLegacyField( VersionInfo $versionInfo, Field $field, Field $originalField, array $context )
+    {
+        return;
+    }
+
+    public function handleEvent( VersionInfo $versionInfo, Field $field, FieldStorageEvent $event, array $context )
     {
         return;
     }
