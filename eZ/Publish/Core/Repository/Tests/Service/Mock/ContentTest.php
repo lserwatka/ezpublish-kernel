@@ -25,6 +25,8 @@ use eZ\Publish\API\Repository\Values\Content\Field;
 use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use eZ\Publish\Core\Repository\Values\ContentType\ContentType;
 use eZ\Publish\Core\Repository\Values\ContentType\FieldDefinition;
+use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
+use eZ\Publish\SPI\FieldType\FieldStorageEvents\PrePublishFieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content\Location as SPILocation;
 use eZ\Publish\SPI\Persistence\Content as SPIContent;
 use eZ\Publish\SPI\Persistence\Content\UpdateStruct as SPIContentUpdateStruct;
@@ -738,6 +740,7 @@ class ContentTest extends BaseServiceMockTest
 
         /** @var VersionInfo|\PHPUnit_Framework_MockObject_MockObject $versionInfoMock */
         $versionInfoMock = $this->getMock( 'eZ\\Publish\\API\\Repository\\Values\\Content\\VersionInfo' );
+
         /** @var ContentInfo|\PHPUnit_Framework_MockObject_MockObject $contentInfoMock */
         $contentInfoMock = $this->getMock( 'eZ\\Publish\\API\\Repository\\Values\\Content\\ContentInfo' );
 
@@ -748,6 +751,27 @@ class ContentTest extends BaseServiceMockTest
         $versionInfoMock->expects( $this->any() )
             ->method( 'getContentInfo' )
             ->will( $this->returnValue( $contentInfoMock ) );
+
+        $contentInfoMock->expects( $this->any() )
+            ->method( '__get' )
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array( 'published', false ),
+                        array( 'id' => 0 )
+                    )
+                )
+            );
+
+        $versionInfoMock->expects( $this->any() )
+            ->method( '__get' )
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array( 'versionNo' => 1 )
+                    )
+                )
+            );
 
         $getMap = array(
             array( 'published', false ),
@@ -762,6 +786,15 @@ class ContentTest extends BaseServiceMockTest
             ->with( "content", "create" )
             ->will( $this->returnValue( true ) );
 
+        /** @var \eZ\Publish\SPI\Persistence\Content\Handler $contentHandlerMock */
+        $contentHandlerMock = $this->getPersistenceMockHandler( 'Content\\Handler' );
+
+        $contentHandlerMock->expects( $this->at( 0 ) )
+            ->method( 'sendFieldStorageEvent' )
+            ->with(
+                $this->isInstanceOf( 'eZ\\Publish\\SPI\\FieldType\\FieldStorageEvents\\PrePublishFieldStorageEvent' )
+            );
+
         $repository->expects( $this->once() )
             ->method( 'beginTransaction' );
 
@@ -772,6 +805,12 @@ class ContentTest extends BaseServiceMockTest
 
         $repository->expects( $this->once() )
             ->method( 'commit' );
+
+        $contentHandlerMock->expects( $this->at( 1 ) )
+            ->method( 'sendFieldStorageEvent' )
+            ->with(
+                $this->isInstanceOf( 'eZ\\Publish\\SPI\\FieldType\\FieldStorageEvents\\PostPublishFieldStorageEvent' )
+            );
 
         self::assertEquals(
             $contentMock,

@@ -10,6 +10,8 @@
 namespace eZ\Publish\Core\Persistence\Legacy\Content;
 
 use eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway as LocationGateway;
+use eZ\Publish\SPI\FieldType\FieldStorageEvents\PrePublishFieldStorageEvent;
+use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content\Handler as BaseContentHandler;
 use eZ\Publish\Core\Persistence\Legacy\Content\UrlAlias\SlugConverter;
 use eZ\Publish\Core\Persistence\Legacy\Content\UrlAlias\Gateway as UrlAliasGateway;
@@ -192,8 +194,16 @@ class Handler implements BaseContentHandler
      */
     public function publish( $contentId, $versionNo, MetadataUpdateStruct $metaDataUpdateStruct )
     {
-        // Archive currently published version
         $versionInfo = $this->loadVersionInfo( $contentId, $versionNo );
+
+        // trigger pre-publish storage event
+        $this->fieldHandler->triggerFieldStorageEvent(
+            $this->load( $contentId, $versionNo ),
+            new PrePublishFieldStorageEvent()
+        );
+
+        // Archive currently published version
+        // @todo do we really want to allow publishing of an already published version ?
         if ( $versionInfo->contentInfo->currentVersionNo != $versionNo )
         {
             $this->setStatus(
@@ -214,6 +224,13 @@ class Handler implements BaseContentHandler
 
         $this->locationGateway->updateLocationsContentVersionNo( $contentId, $versionNo );
         $this->setStatus( $contentId, VersionInfo::STATUS_PUBLISHED, $versionNo );
+
+        // trigger post-publish storage event
+
+        $this->fieldHandler->triggerFieldStorageEvent(
+            $versionInfo,
+            new PostPublishFieldStorageEvent()
+        );
 
         return $this->load( $contentId, $versionNo );
     }
@@ -713,5 +730,10 @@ class Handler implements BaseContentHandler
         return $this->mapper->extractRelationsFromRows(
             $this->contentGateway->loadReverseRelations( $destinationContentId, $type )
         );
+    }
+
+    public function sendFieldStorageEvent( $event, $contentId, $versionNo )
+    {
+        // iterate over all fields of $content/$versionNo, and trigger the events on the applicable ones
     }
 }

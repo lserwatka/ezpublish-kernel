@@ -12,6 +12,8 @@ namespace eZ\Publish\Core\Repository;
 
 use eZ\Publish\API\Repository\ContentService as ContentServiceInterface;
 use eZ\Publish\API\Repository\Repository as RepositoryInterface;
+use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
+use eZ\Publish\SPI\FieldType\FieldStorageEvents\PrePublishFieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Handler;
 use eZ\Publish\Core\Repository\DomainMapper;
 use eZ\Publish\Core\Repository\RelationProcessor;
@@ -1525,6 +1527,13 @@ class ContentService implements ContentServiceInterface
             throw new UnauthorizedException( 'content', 'edit' );
         }
 
+        // trigger pre-publish storage event
+        $this->persistenceHandler->contentHandler()->sendFieldStorageEvent(
+            new PrePublishFieldStorageEvent(),
+            $versionInfo->getContentInfo()->id,
+            $versionInfo->versionNo
+        );
+
         $this->repository->beginTransaction();
         try
         {
@@ -1536,6 +1545,13 @@ class ContentService implements ContentServiceInterface
             $this->repository->rollback();
             throw $e;
         }
+
+        // trigger post-publish storage event
+        $this->persistenceHandler->contentHandler()->sendFieldStorageEvent(
+            new PostPublishFieldStorageEvent(),
+            $content->id,
+            $versionInfo->versionNo
+        );
 
         return $content;
     }
