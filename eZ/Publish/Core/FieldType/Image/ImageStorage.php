@@ -15,9 +15,9 @@ use eZ\Publish\Core\IO\IOService;
 use eZ\Publish\Core\FieldType\GatewayBasedStorage;
 use eZ\Publish\Core\IO\MetadataHandler;
 use eZ\Publish\Core\Base\Exceptions\NotFoundException;
-use eZ\Publish\SPI\FieldType\Event as FieldTypeEvent;
 use eZ\Publish\SPI\FieldType\EventListener as FieldTypeEventListener;
 use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
+use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 
 /**
  * Converter for Image field type external storage
@@ -26,7 +26,7 @@ use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
  * $field->value->externalData. $field->value->data is simply empty, because no
  * internal data is store.
  */
-class ImageStorage extends GatewayBasedStorage implements FieldTypeEventListener
+class ImageStorage extends GatewayBasedStorage
 {
     /**
      * The IO Service used to manipulate data
@@ -308,8 +308,11 @@ class ImageStorage extends GatewayBasedStorage implements FieldTypeEventListener
     }
 
     /**
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
      * @param \eZ\Publish\SPI\Persistence\Content\Field $field
      * @param array $context
+     *
+     * @return \eZ\Publish\SPI\Persistence\Content\Search\Field[]|null
      */
     public function getIndexData( VersionInfo $versionInfo, Field $field, array $context )
     {

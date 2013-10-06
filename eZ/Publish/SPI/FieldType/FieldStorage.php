@@ -119,7 +119,7 @@ interface FieldStorage
      * @param FieldStorageEvent $event
      * @param array $context
      *
-     * @return void
+     * @return bool True if data was modified and needs to be stored
      */
     public function handleEvent( VersionInfo $versionInfo, Field $field, FieldStorageEvent $event, array $context );
 }

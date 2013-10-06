@@ -100,6 +100,6 @@ abstract class GatewayBasedStorage implements FieldStorage
 
     public function handleEvent( VersionInfo $versionInfo, Field $field, \eZ\Publish\SPI\FieldType\FieldStorageEvent $event, array $context )
     {
-        return;
+        return false;
     }
 }
