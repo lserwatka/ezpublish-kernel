@@ -789,12 +789,6 @@ class ContentTest extends BaseServiceMockTest
         /** @var \eZ\Publish\SPI\Persistence\Content\Handler $contentHandlerMock */
         $contentHandlerMock = $this->getPersistenceMockHandler( 'Content\\Handler' );
 
-        $contentHandlerMock->expects( $this->at( 0 ) )
-            ->method( 'sendFieldStorageEvent' )
-            ->with(
-                $this->isInstanceOf( 'eZ\\Publish\\SPI\\FieldType\\FieldStorageEvents\\PrePublishFieldStorageEvent' )
-            );
-
         $repository->expects( $this->once() )
             ->method( 'beginTransaction' );
 
@@ -805,12 +799,6 @@ class ContentTest extends BaseServiceMockTest
 
         $repository->expects( $this->once() )
             ->method( 'commit' );
-
-        $contentHandlerMock->expects( $this->at( 1 ) )
-            ->method( 'sendFieldStorageEvent' )
-            ->with(
-                $this->isInstanceOf( 'eZ\\Publish\\SPI\\FieldType\\FieldStorageEvents\\PostPublishFieldStorageEvent' )
-            );
 
         self::assertEquals(
             $contentMock,

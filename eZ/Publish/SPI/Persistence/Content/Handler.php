@@ -256,15 +256,4 @@ interface Handler
      * @return \eZ\Publish\SPI\Persistence\Content The published Content
      */
     public function publish( $contentId, $versionNo, MetadataUpdateStruct $metaDataUpdateStruct );
-
-    /**
-     * Sends the FieldStorageEvent $event to all applicable fields in $contentId in version $versionNo
-     *
-     * @param FieldStorageEvent $event
-     * @param mixed $contentId
-     * @param int $versionNo
-     *
-     * @return void
-     */
-    public function sendFieldStorageEvent( FieldStorageEvent $event, $contentId, $versionNo );
 }

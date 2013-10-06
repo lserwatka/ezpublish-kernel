@@ -10,6 +10,7 @@
 namespace eZ\Publish\Core\Persistence\Legacy\Content;
 
 use eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway as LocationGateway;
+use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 use eZ\Publish\SPI\FieldType\FieldStorageEvents\PrePublishFieldStorageEvent;
 use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content\Handler as BaseContentHandler;
@@ -197,7 +198,7 @@ class Handler implements BaseContentHandler
         $versionInfo = $this->loadVersionInfo( $contentId, $versionNo );
 
         // trigger pre-publish storage event
-        $this->fieldHandler->triggerFieldStorageEvent(
+        $this->fieldHandler->sendFieldStorageEvents(
             $this->load( $contentId, $versionNo ),
             new PrePublishFieldStorageEvent()
         );
@@ -227,8 +228,8 @@ class Handler implements BaseContentHandler
 
         // trigger post-publish storage event
 
-        $this->fieldHandler->triggerFieldStorageEvent(
-            $versionInfo,
+        $this->fieldHandler->sendFieldStorageEvents(
+            $this->load( $contentId, $versionNo ),
             new PostPublishFieldStorageEvent()
         );
 
@@ -730,10 +731,5 @@ class Handler implements BaseContentHandler
         return $this->mapper->extractRelationsFromRows(
             $this->contentGateway->loadReverseRelations( $destinationContentId, $type )
         );
-    }
-
-    public function sendFieldStorageEvent( $event, $contentId, $versionNo )
-    {
-        // iterate over all fields of $content/$versionNo, and trigger the events on the applicable ones
     }
 }

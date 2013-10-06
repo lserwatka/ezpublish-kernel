@@ -9,6 +9,7 @@
 
 namespace eZ\Publish\Core\Persistence\Legacy\Content;
 
+use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content;
 use eZ\Publish\SPI\Persistence\Content\Type;
 use eZ\Publish\SPI\Persistence\Content\VersionInfo;
@@ -507,5 +508,25 @@ class FieldHandler
             $this->storageHandler->deleteFieldData( $fieldType, $versionInfo, $ids );
         }
         $this->contentGateway->deleteFields( $contentId, $versionInfo->versionNo );
+    }
+
+    /**
+     * Triggers $event on fields from $content
+     *
+     * @param Content $content
+     * @param FieldStorageEvent $event
+     *
+     * @return void
+     */
+    public function sendFieldStorageEvents( Content $content, FieldStorageEvent $event )
+    {
+        foreach ( $content->fields as $field )
+        {
+            // if the event returns true, field data needs to be updated
+            if ( $this->storageHandler->sendEvent( $content->versionInfo, $field, $event ) )
+            {
+                $this->updateField( $content, $field );
+            }
+        }
     }
 }

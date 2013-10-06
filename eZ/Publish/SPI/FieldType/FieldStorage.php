@@ -112,14 +112,14 @@ interface FieldStorage
     public function getIndexData( VersionInfo $versionInfo, Field $field, array $context );
 
     /**
-     * Handles storage event $event on $field in $versionInfo
+     * Handles storage event $event.
      *
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * $event provides the VersionInfo and Field objects the even is occuring on
+     *
      * @param FieldStorageEvent $event
      * @param array $context
      *
      * @return bool True if data was modified and needs to be stored
      */
-    public function handleEvent( VersionInfo $versionInfo, Field $field, FieldStorageEvent $event, array $context );
+    public function handleEvent( FieldStorageEvent $event, array $context );
 }

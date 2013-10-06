@@ -10,6 +10,7 @@
 namespace eZ\Publish\Core\FieldType;
 
 use eZ\Publish\SPI\FieldType\FieldStorage;
+use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content\Field;
 use eZ\Publish\SPI\Persistence\Content\VersionInfo;
 
@@ -98,7 +99,7 @@ abstract class GatewayBasedStorage implements FieldStorage
         return $this->storeFieldData( $versionInfo, $field, $context );
     }
 
-    public function handleEvent( VersionInfo $versionInfo, Field $field, \eZ\Publish\SPI\FieldType\FieldStorageEvent $event, array $context )
+    public function handleEvent( FieldStorageEvent $event, array $context )
     {
         return false;
     }

@@ -80,7 +80,7 @@ class NullStorage implements FieldStorage
         return;
     }
 
-    public function handleEvent( VersionInfo $versionInfo, Field $field, FieldStorageEvent $event, array $context )
+    public function handleEvent( FieldStorageEvent $event, array $context )
     {
         return false;
     }

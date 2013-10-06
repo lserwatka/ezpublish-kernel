@@ -320,22 +320,8 @@ class ImageStorage extends GatewayBasedStorage
         return null;
     }
 
-    public function handleEvent( FieldTypeEvent $event )
+    public function handleEvent( FieldStorageEvent $event, array $context )
     {
-        if ( !$event instanceof PostPublishFieldStorageEvent )
-            return;
-
-        // get new path from PathGenerator, and compare to currently stored path
-        $publishedPath = $this->pathGenerator->getStoragePathForField(
-            $event->field->id,
-            $event->versionInfo->versionNo,
-            $event->field->languageCode,
-            ''
-        );
-
-        if ( $publishedPath != $event->field->value->data['id'] )
-        {
-            // @todo update stored path and reference if applicable
-        }
+        return false;
     }
 }
