@@ -123,7 +123,9 @@ class StorageHandler
      */
     public function sendEvent( VersionInfo $versionInfo, Field $field, FieldStorageEvent $event )
     {
-        return $this->storageRegistry->getStorage( $field->type )
-            ->handleEvent( $versionInfo, $field, $event, $this->context );
+        $event->field = $field;
+        $event->versionInfo = $versionInfo;
+
+        return $this->storageRegistry->getStorage( $field->type )->handleEvent( $event, $this->context );
     }
 }

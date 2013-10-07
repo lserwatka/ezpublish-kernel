@@ -11,14 +11,26 @@
 namespace eZ\Publish\Core\FieldType\Image\PathGenerator;
 
 use eZ\Publish\Core\FieldType\Image\PathGenerator;
+use eZ\Publish\SPI\Persistence\Content\VersionInfo;
 
 class LegacyPathGenerator extends PathGenerator
 {
+    private $publishedImagesDir;
+
+    private $draftImagesDir;
+
+    public function __construct( $publishedImagesDir, $draftImagesDir )
+    {
+        $this->publishedImagesDir = $publishedImagesDir;
+        $this->draftImagesDir = $draftImagesDir;
+    }
+
     /**
      * Generates the storage path for the field identified by parameters
      *
      * Returns a relative storage path.
      *
+     * @param int $status
      * @param mixed $fieldId
      * @param int $versionNo
      * @param string $languageCode
@@ -26,14 +38,33 @@ class LegacyPathGenerator extends PathGenerator
      *
      * @return string
      */
-    public function getStoragePathForField( $fieldId, $versionNo, $languageCode, $nodePathString )
+    public function getStoragePathForField( $status, $fieldId, $versionNo, $languageCode, $nodePathString = '' )
     {
-        return sprintf(
-            '%s%s-%s-%s',
-            $nodePathString, // note that $nodePathString ends with a "/"
-            $fieldId,
-            $versionNo,
-            $languageCode
-        );
+        if ( $status === VersionInfo::STATUS_DRAFT )
+        {
+            return sprintf(
+                '%s/%s/%s-%s',
+                $this->draftImagesDir,
+                $fieldId,
+                $versionNo,
+                $languageCode
+            );
+        }
+        else
+        {
+            return sprintf(
+                '%s/%s%s-%s-%s',
+                $this->publishedImagesDir,
+                $nodePathString, // note that $nodePathString ends with a "/"
+                $fieldId,
+                $versionNo,
+                $languageCode
+            );
+        }
+    }
+
+    public function isPathForDraft( $path )
+    {
+        return ( strpos( $path, "/" . $this->draftImagesDir . "/" ) !== false );
     }
 }

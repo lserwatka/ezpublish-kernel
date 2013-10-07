@@ -525,7 +525,7 @@ class FieldHandler
             // if the event returns true, field data needs to be updated
             if ( $this->storageHandler->sendEvent( $content->versionInfo, $field, $event ) )
             {
-                $this->updateField( $content, $field );
+                $this->updateField( $event->field, $content );
             }
         }
     }
