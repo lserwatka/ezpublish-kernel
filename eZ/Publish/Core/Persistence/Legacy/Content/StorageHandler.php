@@ -113,19 +113,16 @@ class StorageHandler
     }
 
     /**
-     * Sends the storage event $event to $field
+     * Sends the storage event $event
      *
-     * @param VersionInfo $versionInfo
-     * @param Field $field
+     * The event object must reference the VersionInfo and Field it affects.
+     *
      * @param FieldStorageEvent $fieldStorageEvent
      *
      * @return bool true if data was modified by the event
      */
-    public function sendEvent( VersionInfo $versionInfo, Field $field, FieldStorageEvent $event )
+    public function sendEvent( FieldStorageEvent $event )
     {
-        $event->field = $field;
-        $event->versionInfo = $versionInfo;
-
-        return $this->storageRegistry->getStorage( $field->type )->handleEvent( $event, $this->context );
+        return $this->storageRegistry->getStorage( $event->field->type )->handleEvent( $event, $this->context );
     }
 }

@@ -11,7 +11,6 @@ namespace eZ\Publish\SPI\Persistence\Content;
 
 // @todo We must verify whether we want to type cast on the "Criterion" interface or abstract class
 use eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct as RelationCreateStruct;
-use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 
 /**
  * The Content Handler interface defines content operations on the storage engine.

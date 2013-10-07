@@ -520,10 +520,14 @@ class FieldHandler
      */
     public function sendFieldStorageEvents( Content $content, FieldStorageEvent $event )
     {
+        $event->versionInfo = $content->versionInfo;
+
         foreach ( $content->fields as $field )
         {
+            $event->field = $field;
+
             // if the event returns true, field data needs to be updated
-            if ( $this->storageHandler->sendEvent( $content->versionInfo, $field, $event ) === true )
+            if ( $this->storageHandler->sendEvent( $event ) === true )
             {
                 $this->updateField( $event->field, $content );
             }

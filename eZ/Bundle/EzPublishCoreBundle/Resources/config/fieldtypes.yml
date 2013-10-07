@@ -398,7 +398,7 @@ services:
         tags:
             - {name: ezpublish.fieldType, alias: ezimage}
 
-    ezpublish.fieldType.ezimage.io_service:
+    ezpublish.fieldType.ezimage.IOService:
         class: %ezpublish.core.io.service.class%
         factory_service: ezpublish.core.io.factory
         factory_method: getService
@@ -415,7 +415,7 @@ services:
         class: %ezpublish.fieldType.ezimage.externalStorage.class%
         arguments:
             - []
-            - @ezpublish.fieldType.ezimage.io_service
+            - @ezpublish.fieldType.ezimage.IOService
             - @ezpublish.fieldType.ezimage.pathGenerator
             - @ezpublish.fieldType.metadataHandler.imagesize
         tags:

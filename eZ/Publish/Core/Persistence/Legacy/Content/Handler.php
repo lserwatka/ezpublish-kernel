@@ -227,7 +227,6 @@ class Handler implements BaseContentHandler
         $this->setStatus( $contentId, VersionInfo::STATUS_PUBLISHED, $versionNo );
 
         // trigger post-publish storage event
-
         $this->fieldHandler->sendFieldStorageEvents(
             $this->load( $contentId, $versionNo ),
             new PostPublishFieldStorageEvent()

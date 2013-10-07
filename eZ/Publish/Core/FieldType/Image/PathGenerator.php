@@ -26,5 +26,12 @@ abstract class PathGenerator
      */
     abstract public function getStoragePathForField( $status, $fieldId, $versionNo, $languageCode, $nodePathString = '' );
 
+    /**
+     * Tells if $path is the path to an image draft
+     *
+     * @param $path
+     *
+     * @return bool
+     */
     abstract public function isPathForDraft( $path );
 }
