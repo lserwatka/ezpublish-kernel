@@ -98,7 +98,7 @@ class ImageStorage extends GatewayBasedStorage
             if ( !$this->IOService->loadBinaryFile( $targetPath ) )
             {
                 $binaryFileCreateStruct = $this->IOService->newBinaryCreateStructFromLocalFile(
-                    $field  ->value->externalData['id']
+                    $field->value->externalData['id']
                 );
                 $binaryFileCreateStruct->id = $targetPath;
                 $binaryFile = $this->IOService->createBinaryFile( $binaryFileCreateStruct );
@@ -272,13 +272,12 @@ class ImageStorage extends GatewayBasedStorage
     public function handleEvent( FieldStorageEvent $event, array $context )
     {
         if ( !$event instanceof PostPublishFieldStorageEvent )
-            return;
+            return false;
 
         // If the path we currently have isn't the path to a draft, we have nothing to do
         if ( !$this->pathGenerator->isPathForDraft( $event->field->value->data['id'] ) )
             return false;
 
-        // get new path from PathGenerator, and compare to currently stored path
         $publishedPath = $this->pathGenerator->getStoragePathForField(
             $event->versionInfo->status,
             $event->field->id,

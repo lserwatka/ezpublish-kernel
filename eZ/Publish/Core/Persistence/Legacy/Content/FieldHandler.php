@@ -523,7 +523,7 @@ class FieldHandler
         foreach ( $content->fields as $field )
         {
             // if the event returns true, field data needs to be updated
-            if ( $this->storageHandler->sendEvent( $content->versionInfo, $field, $event ) )
+            if ( $this->storageHandler->sendEvent( $content->versionInfo, $field, $event ) === true )
             {
                 $this->updateField( $event->field, $content );
             }
