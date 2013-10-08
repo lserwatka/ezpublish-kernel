@@ -32,6 +32,10 @@ Changes affecting version compatibility with former or future versions.
   to avoid unnecessary translation between the two layers. It will cause BC problems only
   if hardcoded values were used instead of provided constants.
 
+* `eZ\Publish\API\Repository\Values\Content\Query\SortClause\Field` and `eZ\Publish\API\Repository\Values\Content\Query\SortClause\Target\FieldTarget`
+  have a new required parameter: $languageCode. This is introduced because sorting on a Field value
+  of Content that exists in multiple languages is ambiguous and was producing wrong results.
+
 ## Deprecations
 
 * It was incidentally possible to reference resources in REST API payloads without
