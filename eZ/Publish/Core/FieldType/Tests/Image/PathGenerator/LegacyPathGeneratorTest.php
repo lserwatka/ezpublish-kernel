@@ -29,7 +29,7 @@ class LegacyPathGeneratorTest extends PHPUnit_Framework_TestCase
      */
     public function testGetStoragePathForField( $data, $expectedPath )
     {
-        $pathGenerator = new LegacyPathGenerator( 'images-versioned', 'images' );
+        $pathGenerator = $this->getPathGenerator();
 
         $this->assertEquals(
             $expectedPath,
@@ -77,5 +77,34 @@ class LegacyPathGeneratorTest extends PHPUnit_Framework_TestCase
                 'images-versioned/23/2-eng-GB',
             ),
         );
+    }
+
+    /**
+     * @covers LegacyPathGenerator::isPathForDraft()
+     * @dataProvider providePathForTestIsPathForDraft
+     */
+    public function testIsPathForDraft( $path, $isPathForDraft )
+    {
+        self::assertEquals(
+            $isPathForDraft,
+            $this->getPathGenerator()->isPathForDraft( $path )
+        );
+    }
+
+    public function providePathForTestIsPathForDraft()
+    {
+        return array(
+            array( 'var/dir/storage/images/sindelfingen/bielefeld/23-1-eng-US', false ),
+            array( 'var/dir/storage/images/sindelfingen/23-42-ger-DE', false ),
+            array( 'var/dir/storage/images-versioned/23/2-eng-GB', true )
+        );
+    }
+
+    /**
+     * @return LegacyPathGenerator
+     */
+    protected function getPathGenerator()
+    {
+        return new LegacyPathGenerator( 'images-versioned', 'images' );
     }
 }
