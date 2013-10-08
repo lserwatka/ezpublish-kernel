@@ -29,11 +29,12 @@ class LegacyPathGeneratorTest extends PHPUnit_Framework_TestCase
      */
     public function testGetStoragePathForField( $data, $expectedPath )
     {
-        $pathGenerator = new LegacyPathGenerator();
+        $pathGenerator = new LegacyPathGenerator( 'images-versioned', 'images' );
 
         $this->assertEquals(
             $expectedPath,
             $pathGenerator->getStoragePathForField(
+                $data['status'],
                 $data['fieldId'],
                 $data['versionNo'],
                 $data['languageCode'],
@@ -47,30 +48,33 @@ class LegacyPathGeneratorTest extends PHPUnit_Framework_TestCase
         return array(
             array(
                 array(
+                    'status' => 1, // VersionInfo::STATUS_PUBLISHED
                     'fieldId' => 23,
                     'versionNo' => 1,
                     'languageCode' => 'eng-US',
                     'nodePathString' => 'sindelfingen/bielefeld/',
                 ),
-                'sindelfingen/bielefeld/23-1-eng-US',
+                'images/sindelfingen/bielefeld/23-1-eng-US',
             ),
             array(
                 array(
+                    'status' => 1, // VersionInfo::STATUS_PUBLISHED
                     'fieldId' => 23,
                     'versionNo' => 42,
                     'languageCode' => 'ger-DE',
                     'nodePathString' => 'sindelfingen/',
                 ),
-                'sindelfingen/23-42-ger-DE',
+                'images/sindelfingen/23-42-ger-DE',
             ),
             array(
                 array(
+                    'status' => 0, // VersionInf::STATUS_DRAFT
                     'fieldId' => 23,
                     'versionNo' => 2,
                     'languageCode' => 'eng-GB',
                     'nodePathString' => null,
                 ),
-                '23-2-eng-GB',
+                'images-versioned/23/2-eng-GB',
             ),
         );
     }

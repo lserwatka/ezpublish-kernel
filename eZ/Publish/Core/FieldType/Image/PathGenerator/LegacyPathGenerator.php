@@ -19,10 +19,14 @@ class LegacyPathGenerator extends PathGenerator
 
     private $draftImagesDir;
 
-    public function __construct( $publishedImagesDir, $draftImagesDir )
+    /**
+     * @var string $draftPrefix Prefix for path to draft images
+     * @var string $publishedPrefix Prefix for path to published images
+     */
+    public function __construct( $draftPrefix, $publishedPrefix )
     {
-        $this->publishedImagesDir = $publishedImagesDir;
-        $this->draftImagesDir = $draftImagesDir;
+        $this->publishedImagesDir = $publishedPrefix;
+        $this->draftImagesDir = $draftPrefix;
     }
 
     /**
