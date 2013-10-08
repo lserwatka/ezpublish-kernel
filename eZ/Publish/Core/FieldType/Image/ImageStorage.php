@@ -98,7 +98,7 @@ class ImageStorage extends GatewayBasedStorage
         // new image
         if ( isset( $field->value->externalData ) )
         {
-            $targetPath = $this->getFieldPath(
+            $targetPath = $this->pathGenerator->getStoragePathForField(
                 $versionInfo->status,
                 $field->id,
                 $versionInfo->versionNo,
@@ -169,26 +169,6 @@ class ImageStorage extends GatewayBasedStorage
 
         // Data has been updated and needs to be stored!
         return true;
-    }
-
-    /**
-     * Returns the path where images for the defined $fieldId are stored
-     *
-     * @param mixed $fieldId
-     * @param int $versionNo
-     * @param string $languageCode
-     * @param string $nodePathString
-     *
-     * @return string
-     */
-    protected function getFieldPath( $fieldId, $versionNo, $languageCode, $nodePathString )
-    {
-        return $this->pathGenerator->getStoragePathForField(
-            $fieldId,
-            $versionNo,
-            $languageCode,
-            $nodePathString
-        );
     }
 
     public function getFieldData( VersionInfo $versionInfo, Field $field, array $context )
