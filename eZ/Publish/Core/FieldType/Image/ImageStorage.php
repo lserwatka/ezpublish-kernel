@@ -77,7 +77,7 @@ class ImageStorage extends GatewayBasedStorage
         IOService $IOService,
         PathGenerator $pathGenerator,
         MetadataHandler $imageSizeMetadataHandler,
-        LoggerInterface $logger
+        LoggerInterface $logger = null
     )
     {
         parent::__construct( $gateways );
