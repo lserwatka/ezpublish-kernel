@@ -463,6 +463,18 @@ class Handler implements HandlerInterface
         if ( !isset( $this->searchHandler ) )
         {
             $db = $this->dbHandler;
+            $commaSeparatedCollectionValueHandler = new CriterionHandler\FieldValue\Handler\Collection(
+                $db, $this->transformationProcessor, ","
+            );
+            $hyphenSeparatedCollectionValueHandler = new CriterionHandler\FieldValue\Handler\Collection(
+                $db, $this->transformationProcessor, "-"
+            );
+            $compositeValueHandler = new CriterionHandler\FieldValue\Handler\Composite(
+                $db, $this->transformationProcessor
+            );
+            $simpleValueHandler = new CriterionHandler\FieldValue\Handler\Simple(
+                $db, $this->transformationProcessor
+            );
             $this->searchHandler = new Content\Search\Handler(
                 new Content\Search\Gateway\ExceptionConversion(
                     new Content\Search\Gateway\EzcDatabase(
@@ -484,7 +496,6 @@ class Handler implements HandlerInterface
                                 new CriterionHandler\RemoteId( $db ),
                                 new CriterionHandler\LocationRemoteId( $db ),
                                 new CriterionHandler\SectionId( $db ),
-                                new CriterionHandler\Status( $db ),
                                 new CriterionHandler\FullText(
                                     $db,
                                     $this->transformationProcessor
@@ -492,6 +503,23 @@ class Handler implements HandlerInterface
                                 new CriterionHandler\Field(
                                     $db,
                                     $this->converterRegistry,
+                                    new CriterionHandler\FieldValue\Converter(
+                                        new CriterionHandler\FieldValue\HandlerRegistry(
+                                            array(
+                                                "ezboolean" => $simpleValueHandler,
+                                                "ezcountry" => $commaSeparatedCollectionValueHandler,
+                                                "ezdate" => $simpleValueHandler,
+                                                "ezdatetime" => $simpleValueHandler,
+                                                "ezemail" => $simpleValueHandler,
+                                                "ezinteger" => $simpleValueHandler,
+                                                "ezobjectrelation" => $simpleValueHandler,
+                                                "ezobjectrelationlist" => $commaSeparatedCollectionValueHandler,
+                                                "ezselection" => $hyphenSeparatedCollectionValueHandler,
+                                                "eztime" => $simpleValueHandler,
+                                            )
+                                        ),
+                                        $compositeValueHandler
+                                    ),
                                     $this->transformationProcessor
                                 ),
                                 new CriterionHandler\ObjectStateId( $db ),

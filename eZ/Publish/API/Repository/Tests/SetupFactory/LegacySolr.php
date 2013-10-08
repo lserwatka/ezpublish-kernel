@@ -108,7 +108,7 @@ class LegacySolr extends Legacy
                 'eztext'                => new FieldType\TextLine\SearchField(),
                 'ezxmltext'             => new FieldType\TextLine\SearchField(),
                 // @todo: Define proper types for these:
-                'ezcountry'             => new FieldType\Unindexed(),
+                'ezcountry'             => new FieldType\Country\SearchField(),
                 'ezfloat'               => new FieldType\Unindexed(),
                 'ezinteger'             => new FieldType\Unindexed(),
                 'ezuser'                => new FieldType\Unindexed(),
@@ -161,7 +161,6 @@ class LegacySolr extends Legacy
                         new CriterionVisitor\DateMetadata\PublishedIn(),
                         new CriterionVisitor\DateMetadata\ModifiedBetween(),
                         new CriterionVisitor\DateMetadata\PublishedBetween(),
-                        new CriterionVisitor\StatusIn(),
                         new CriterionVisitor\FullText(),
                         new CriterionVisitor\Field\FieldIn(
                             $fieldRegistry,
