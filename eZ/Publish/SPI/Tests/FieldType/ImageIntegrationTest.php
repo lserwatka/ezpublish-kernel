@@ -89,7 +89,7 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
                     'LegacyStorage' => new FieldType\Image\ImageStorage\Gateway\LegacyStorage(),
                 ),
                 $this->getIOService(),
-                new FieldType\Image\PathGenerator\LegacyPathGenerator(),
+                new FieldType\Image\PathGenerator\LegacyPathGenerator( 'images', 'images-versioned' ),
                 new IO\MetadataHandler\ImageSize()
             )
         );
