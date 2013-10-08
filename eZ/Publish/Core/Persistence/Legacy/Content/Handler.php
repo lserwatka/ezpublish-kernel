@@ -10,7 +10,6 @@
 namespace eZ\Publish\Core\Persistence\Legacy\Content;
 
 use eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway as LocationGateway;
-use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 use eZ\Publish\SPI\FieldType\FieldStorageEvents\PrePublishFieldStorageEvent;
 use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content\Handler as BaseContentHandler;
