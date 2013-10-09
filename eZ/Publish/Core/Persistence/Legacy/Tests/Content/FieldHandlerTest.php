@@ -833,10 +833,7 @@ class FieldHandlerTest extends LanguageAwareTestCase
         $fieldHandler->deleteFields( 42, new VersionInfo( array( 'versionNo' => 2 ) ) );
     }
 
-    /**
-     * Disabled as the mocks are driving me CRAZY. M.D.K.
-     */
-    public function noTestSendFieldStorageEvents()
+    public function testSendFieldStorageEvents()
     {
         // content with several fields
         $content = $this->getContentFixture();
@@ -847,16 +844,18 @@ class FieldHandlerTest extends LanguageAwareTestCase
         $i = 0;
         foreach ( $content->fields as $field )
         {
-            $returnValue = false;
+            $storageHandlerMock->expects( $this->at( $i++ ) )
+                ->method( 'sendEvent' )
+                ->with( $this->isInstanceOf( get_class( $event ) ) )
+                ->will( $this->returnValue( $i == 0 ) );
+
             if ( $i == 0 )
             {
-                $returnValue = true;
-
                 // We mock the call to updateField that occurs on the first field
                 $mapperMock = $this->getMapperMock();
                 $mapperMock->expects( $this->exactly( 2 ) )
                     ->method( 'convertToStorageValue' )
-                    ->with( $this->isInstanceOf( 'eZ\\Publish\\SPI\\Persistence\\Content\\Field' ) )
+                    ->with( $field )
                     ->will( $this->returnValue( new StorageFieldValue() ) );
 
                 $contentGatewayMock = $this->getContentGatewayMock();
@@ -864,19 +863,10 @@ class FieldHandlerTest extends LanguageAwareTestCase
                     ->method( 'updateField' )
                     ->with( $field, $mapperMock->convertToStorageValue( $field ) );
 
-                $storageHandlerMock->expects( $this->once() )
+                $storageHandlerMock->expects( $this->at( $i++ ) )
                     ->method( 'storeFieldData' )
                     ->with( $content->versionInfo, $field );
             }
-
-            $sentEvent = clone $event;
-            $sentEvent->versionInfo = $content->versionInfo;
-            $sentEvent->field = $field;
-            $storageHandlerMock->expects( $this->at( $i++ ) )
-                ->method( 'sendEvent' )
-                ->with( $sentEvent )
-                ->will( $this->returnValue( $returnValue ) );
-            unset( $sentEvent );
         }
 
         $this->getFieldHandler()->sendFieldStorageEvents( $content, $event );
