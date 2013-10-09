@@ -57,7 +57,7 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
      */
     protected function getStoragePrefix()
     {
-        return '';
+        return 'images';
     }
 
     /**
