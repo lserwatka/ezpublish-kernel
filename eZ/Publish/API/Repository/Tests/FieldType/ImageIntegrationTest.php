@@ -42,7 +42,7 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
      *
      * @var string
      */
-    private $publishedImagePCRE = '#var/ezdemo_site/storage/images/[0-9]+-[0-9]+-[a-z]{3}-[A-Z]{2}/[a-zA-Z\-]+\.[a-z]{3,4}#';
+    private $publishedImagePCRE = '#var/ezdemo_site/storage/images/[a-zA-Z0-9_]+/[0-9]+-[0-9]+-[a-z]{3}-[A-Z]{2}/[a-zA-Z\-]+\.[a-z]{3,4}#';
 
     /**
      * Stores the loaded image path for copy test.

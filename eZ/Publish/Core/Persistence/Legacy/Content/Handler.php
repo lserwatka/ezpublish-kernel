@@ -203,7 +203,6 @@ class Handler implements BaseContentHandler
         );
 
         // Archive currently published version
-        // @todo do we really want to allow publishing of an already published version ?
         if ( $versionInfo->contentInfo->currentVersionNo != $versionNo )
         {
             $this->setStatus(

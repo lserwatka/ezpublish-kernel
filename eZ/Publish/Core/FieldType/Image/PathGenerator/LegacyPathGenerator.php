@@ -57,9 +57,9 @@ class LegacyPathGenerator extends PathGenerator
         else
         {
             return sprintf(
-                '%s/%s%s-%s-%s',
+                '%s/%s/%s-%s-%s',
                 $this->publishedImagesDir,
-                $nodePathString, // note that $nodePathString ends with a "/"
+                $nodePathString, // note that $nodePathString ends with a "/" (does it ?)
                 $fieldId,
                 $versionNo,
                 $languageCode
