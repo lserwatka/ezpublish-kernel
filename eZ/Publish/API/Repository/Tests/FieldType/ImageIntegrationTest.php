@@ -186,6 +186,10 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
             $field->value
         );
 
+        /**
+         * Disabled.
+         * See explanation in eZ\Publish\API\Repository\Tests\FieldType\BinaryFileIntegrationTest::assertFileDataLoadedCorrect()
+         */
         /*$this->assertTrue(
             $exists = file_exists( $path = $this->getInstallDir() . '/' . $field->value->id ),
             "Asserting that $path exists."
@@ -275,6 +279,10 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
             $field->value
         );
 
+        /**
+         * Disabled.
+         * See explanation in eZ\Publish\API\Repository\Tests\FieldType\BinaryFileIntegrationTest::assertFileDataLoadedCorrect()
+         */
         /*$this->assertTrue(
             file_exists( $path = $this->getInstallDir() . '/' . $field->value->id ),
             "Asserting that file $path exists"
