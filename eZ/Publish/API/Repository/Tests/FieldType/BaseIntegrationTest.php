@@ -151,7 +151,7 @@ abstract class BaseIntegrationTest extends Tests\BaseTest
     abstract public function getValidUpdateFieldData();
 
     /**
-     * Asserts the the field data was loaded correctly.
+     * Asserts the field data was loaded correctly.
      *
      * Asserts that the data provided by {@link getValidUpdateFieldData()}
      * was stored and loaded correctly.
@@ -159,6 +159,17 @@ abstract class BaseIntegrationTest extends Tests\BaseTest
      * @param Field $field
      */
     abstract public function assertUpdatedFieldDataLoadedCorrect( Field $field );
+
+    /**
+     * Asserts that the field data was loaded correctly after publishing
+     *
+     * Does nothing by default, but can be overridden by types that modify field data upon publishing
+     *
+     * @param Field $field
+     */
+    public function assertPublishedFieldDataLoadedCorrect( $field )
+    {
+    }
 
     /**
      * Get field data which will result in errors during update
@@ -676,6 +687,7 @@ abstract class BaseIntegrationTest extends Tests\BaseTest
     /**
      * @dep_ends eZ\Publish\API\Repository\Tests\ContentServiceTest::testUpdateContent
      * @depends testLoadFieldType
+     * @return \eZ\Publish\API\Repository\Values\Content\Content
      */
     public function testUpdateField()
     {
@@ -729,6 +741,32 @@ abstract class BaseIntegrationTest extends Tests\BaseTest
     public function testUpdatedDataCorrect( Field $field )
     {
         $this->assertUpdatedFieldDataLoadedCorrect( $field );
+    }
+
+    /**
+     * @depends testPublishContent
+     * @return \eZ\Publish\API\Repository\Values\Content\Field
+     */
+    public function testPublishedTypeFieldStillAvailable()
+    {
+        $content = $this->testPublishContent();
+        foreach ( $content->getFields() as $field )
+        {
+            if ( $field->fieldDefIdentifier === $this->customFieldIdentifier )
+            {
+                return $field;
+            }
+        }
+
+        $this->fail( "Custom field not found." );
+    }
+
+    /**
+     * @depends testPublishedTypeFieldStillAvailable
+     */
+    public function testPublishedDataCorrect( Field $field )
+    {
+        $this->assertPublishedFieldDataLoadedCorrect( $field );
     }
 
     /**

@@ -21,6 +21,30 @@ use eZ\Publish\API\Repository\Values\Content\Field;
 class ImageIntegrationTest extends FileBaseIntegrationTest
 {
     /**
+     * PCRE that verifies an imageId
+     * @var string
+     */
+    private $imageIdPCRE = '#[0-9]+-[0-9]+#';
+
+    /**
+     * PCRE that verifies a versioned image path, relative to the doc root, without leading /
+     *
+     * Example: var/ezdemo_site/storage/images-versioned/222/1-eng-US/Icy-Night-Flower.jpg
+     *
+     * @var string
+     */
+    private $versionedImagePCRE = '#var/ezdemo_site/storage/images-versioned/[0-9]+/[0-9]+-[a-z]{3}-[A-Z]{2}/[a-zA-Z\-]+\.[a-z]{3,4}#';
+
+    /**
+     * PCRE that verifies a published image path, relative to the doc root, without leading /
+     *
+     * Example: var/ezdemo_site/storage/images/222-1-eng-US/Icy-Night-Flower.jpg
+     *
+     * @var string
+     */
+    private $publishedImagePCRE = '#var/ezdemo_site/storage/images/[0-9]+-[0-9]+-[a-z]{3}-[A-Z]{2}/[a-zA-Z\-]+\.[a-z]{3,4}#';
+
+    /**
      * Stores the loaded image path for copy test.
      */
     protected static $loadedImagePath;
@@ -186,6 +210,68 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
             $field->value
         );
 
+        self::assertTrue(
+            (bool)preg_match(
+                $this->versionedImagePCRE,
+                $field->value->id
+            ),
+            "Failed asserting that {$field->value->id} matches expected versioned image path format {$this->versionedImagePCRE}"
+        );
+
+        self::assertTrue(
+            (bool)preg_match(
+                $this->imageIdPCRE,
+                $field->value->imageId
+            ),
+            "Failed asserting that {$field->value->imageId} matches expected imageId format {$this->imageIdPCRE}"
+        );
+
+        /**
+         * Disabled.
+         * See explanation in eZ\Publish\API\Repository\Tests\FieldType\BinaryFileIntegrationTest::assertFileDataLoadedCorrect()
+         */
+        /*$this->assertTrue(
+            $exists = file_exists( $path = $this->getInstallDir() . '/' . $field->value->id ),
+            "Asserting that $path exists."
+        );*/
+
+        self::$loadedImagePath = $field->value->id;
+    }
+
+    public function assertPublishedFieldDataLoadedCorrect( Field $field )
+    {
+        $this->assertInstanceOf(
+            'eZ\\Publish\\Core\\FieldType\\Image\\Value',
+            $field->value
+        );
+
+        $fixtureData = $this->getFixtureData();
+        $expectedData = $fixtureData['create'];
+
+        // Will change during storage
+        unset( $expectedData['id'], $expectedData['imageId'] );
+
+        $this->assertPropertiesCorrect(
+            $expectedData,
+            $field->value
+        );
+
+        self::assertTrue(
+            (bool)preg_match(
+                $this->publishedImagePCRE,
+                $field->value->id
+            ),
+            "Failed asserting that {$field->value->id} matches expected published image path format {$this->publishedImagePCRE}"
+        );
+
+        self::assertTrue(
+            (bool)preg_match(
+                $this->imageIdPCRE,
+                $field->value->imageId
+            ),
+            "Failed asserting that {$field->value->imageId} matches expected imageId format {$this->imageIdPCRE}"
+        );
+
         /**
          * Disabled.
          * See explanation in eZ\Publish\API\Repository\Tests\FieldType\BinaryFileIntegrationTest::assertFileDataLoadedCorrect()
@@ -325,7 +411,7 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
      */
     public function assertCopiedFieldDataLoadedCorrectly( Field $field )
     {
-        $this->assertFieldDataLoadedCorrect( $field );
+        $this->assertPublishedFieldDataLoadedCorrect( $field );
 
         $this->assertEquals(
             self::$loadedImagePath,
