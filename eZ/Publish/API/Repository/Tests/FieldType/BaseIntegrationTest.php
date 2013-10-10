@@ -38,6 +38,10 @@ use PHPUnit_Framework_AssertionFailedError;
  * - Test toHash
  * - Test fromHash
  *
+ * Tests listed above will interact with the database, and return the involved value objects.
+ * These objects will be passed on to various tests in order to test the validity of data
+ * using  assertions implemented for each type.
+ *
  * @group integration
  * @group field-type
  *

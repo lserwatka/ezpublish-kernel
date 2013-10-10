@@ -476,6 +476,10 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
         );
     }
 
+    /**
+     * Tests that copying a Content with an image field will re-use the
+     * image from the copied field as a reference instead of copying it.
+     */
     public function testInherentCopyForNewLanguage()
     {
         $repository = $this->getRepository();
