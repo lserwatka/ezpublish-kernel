@@ -296,12 +296,13 @@ class ImageStorage extends GatewayBasedStorage
         if ( !$this->pathGenerator->isPathForDraft( $event->field->value->data['id'] ) )
             return false;
 
+        $nodePathString = $this->getGateway( $context )->getNodePathString( $event->versionInfo, $event->field->id );
         $publishedPath = $this->pathGenerator->getStoragePathForField(
             $event->versionInfo->status,
             $event->field->id,
             $event->versionInfo->versionNo,
             $event->field->languageCode,
-            $this->getGateway( $context )->getNodePathString( $event->versionInfo, $event->field->id )
+            $nodePathString
         ) . '/' . $event->field->value->data['fileName'];
 
         $binaryFileId = $this->IOService->getExternalPath( $event->field->value->data['id'] );
@@ -324,7 +325,7 @@ class ImageStorage extends GatewayBasedStorage
         $event->field->value->data['uri'] = $publishedBinaryFile->uri;
         $event->field->value->data['id'] = ltrim( $publishedBinaryFile->uri, '/' );
         $this->getGateway( $context )->storeImageReference(
-            $event->field->value->data['uri'],
+            $event->field->value->data['id'],
             $event->field->id
         );
         return true;

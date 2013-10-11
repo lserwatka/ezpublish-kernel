@@ -38,7 +38,7 @@ class ImageIntegrationTest extends FileBaseIntegrationTest
     /**
      * PCRE that verifies a published image path, relative to the doc root, without leading /
      *
-     * Example: var/ezdemo_site/storage/images/222-1-eng-US/Icy-Night-Flower.jpg
+     * Example: var/ezdemo_site/storage/images/my_icy_flower/222-1-eng-US/Icy-Night-Flower.jpg
      *
      * @var string
      */

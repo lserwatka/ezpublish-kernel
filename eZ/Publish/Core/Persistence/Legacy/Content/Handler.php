@@ -10,6 +10,7 @@
 namespace eZ\Publish\Core\Persistence\Legacy\Content;
 
 use eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway as LocationGateway;
+use eZ\Publish\SPI\FieldType\FieldStorageEvent;
 use eZ\Publish\SPI\FieldType\FieldStorageEvents\PrePublishFieldStorageEvent;
 use eZ\Publish\SPI\FieldType\FieldStorageEvents\PostPublishFieldStorageEvent;
 use eZ\Publish\SPI\Persistence\Content\Handler as BaseContentHandler;
@@ -196,12 +197,6 @@ class Handler implements BaseContentHandler
     {
         $versionInfo = $this->loadVersionInfo( $contentId, $versionNo );
 
-        // trigger pre-publish storage event
-        $this->fieldHandler->sendFieldStorageEvents(
-            $this->load( $contentId, $versionNo ),
-            new PrePublishFieldStorageEvent()
-        );
-
         // Archive currently published version
         if ( $versionInfo->contentInfo->currentVersionNo != $versionNo )
         {
@@ -224,12 +219,7 @@ class Handler implements BaseContentHandler
         $this->locationGateway->updateLocationsContentVersionNo( $contentId, $versionNo );
         $this->setStatus( $contentId, VersionInfo::STATUS_PUBLISHED, $versionNo );
 
-        // trigger post-publish storage event
-        $this->fieldHandler->sendFieldStorageEvents(
-            $this->load( $contentId, $versionNo ),
-            new PostPublishFieldStorageEvent()
-        );
-
+        // @todo Why should publish return something at all ? Not doing so would make cache handling easier.
         return $this->load( $contentId, $versionNo );
     }
 
@@ -728,5 +718,15 @@ class Handler implements BaseContentHandler
         return $this->mapper->extractRelationsFromRows(
             $this->contentGateway->loadReverseRelations( $destinationContentId, $type )
         );
+    }
+
+    public function sendFieldStorageEvent( $contentId, $versionNo, FieldStorageEvent $event )
+    {
+        $content = $this->load( $contentId, $versionNo );
+        if ( $this->fieldHandler->sendFieldStorageEvents( $content, $event ) === true )
+        {
+            $content = $this->load( $contentId, $versionNo );
+        }
+        return $content;
     }
 }

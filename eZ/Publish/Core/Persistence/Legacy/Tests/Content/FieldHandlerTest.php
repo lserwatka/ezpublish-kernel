@@ -847,9 +847,9 @@ class FieldHandlerTest extends LanguageAwareTestCase
             $storageHandlerMock->expects( $this->at( $i++ ) )
                 ->method( 'sendEvent' )
                 ->with( $this->isInstanceOf( get_class( $event ) ) )
-                ->will( $this->returnValue( $i == 0 ) );
+                ->will( $this->returnValue( $i == 1 ) );
 
-            if ( $i == 0 )
+            if ( $i == 1 )
             {
                 // We mock the call to updateField that occurs on the first field
                 $mapperMock = $this->getMapperMock();
@@ -869,7 +869,30 @@ class FieldHandlerTest extends LanguageAwareTestCase
             }
         }
 
-        $this->getFieldHandler()->sendFieldStorageEvents( $content, $event );
+        self::assertTrue(
+            $this->getFieldHandler()->sendFieldStorageEvents( $content, $event )
+        );
+    }
+
+    /**
+     * Tests behaviour when events don't touch data
+     */
+    public function testSendFieldStorageEventNoChanges()
+    {
+        // content with several fields
+        $content = $this->getContentFixture();
+        $event = new PostPublishFieldStorageEvent();
+
+        // The first field of our content has an event that modifies data, the others don't
+        $storageHandlerMock = $this->getStorageHandlerMock();
+        $storageHandlerMock->expects( $this->exactly( count( $content->fields ) ) )
+            ->method( 'sendEvent' )
+            ->with( $this->isInstanceOf( get_class( $event ) ) )
+            ->will( $this->returnValue( false ) );
+
+        self::assertFalse(
+            $this->getFieldHandler()->sendFieldStorageEvents( $content, $event )
+        );
     }
 
     /**
