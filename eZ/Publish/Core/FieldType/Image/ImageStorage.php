@@ -165,9 +165,12 @@ class ImageStorage extends GatewayBasedStorage
             $field->value->externalData = null;
         }
 
-        $this->getGateway( $context )->storeImageReference( $field->value->data['uri'], $field->id );
+        // only store if there are no earlier references to this file for this field
+        // isn't that a responsibility from the gateway ?
+        // Shouldn't the gateway decide how it handles those references, given the Field object ?
+        $this->getGateway( $context )->storeImageReference( $field->value->data['id'], $field->id );
 
-        // Data has been updated and needs to be stored!
+        // Data has been updated and needs to be stored
         return true;
     }
 
@@ -296,7 +299,7 @@ class ImageStorage extends GatewayBasedStorage
         if ( !$this->pathGenerator->isPathForDraft( $event->field->value->data['id'] ) )
             return false;
 
-        $nodePathString = $this->getGateway( $context )->getNodePathString( $event->versionInfo, $event->field->id );
+        $nodePathString = $this->getGateway( $context )->getNodePathString( $event->versionInfo );
         $publishedPath = $this->pathGenerator->getStoragePathForField(
             $event->versionInfo->status,
             $event->field->id,
@@ -321,13 +324,22 @@ class ImageStorage extends GatewayBasedStorage
 
         $publishedBinaryFile = $this->IOService->createBinaryFile( $publishedFileCreateStruct );
         $this->IOService->deleteBinaryFile( $draftBinaryFile );
+        $this->getGateway( $context )->removeImageReferences(
+            ltrim( $draftBinaryFile->uri, '/' ),
+            $event->field->id
+        );
 
         $event->field->value->data['uri'] = $publishedBinaryFile->uri;
         $event->field->value->data['id'] = ltrim( $publishedBinaryFile->uri, '/' );
-        $this->getGateway( $context )->storeImageReference(
-            $event->field->value->data['id'],
-            $event->field->id
-        );
+
         return true;
+    }
+
+    /**
+     * @return \eZ\Publish\Core\FieldType\Image\ImageStorage\Gateway
+     */
+    protected function getGateway( array $context )
+    {
+        return parent::getGateway( $context );
     }
 }

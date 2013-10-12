@@ -189,7 +189,7 @@ class LegacyStorage extends Gateway
      *
      * @return void
      */
-    public function removeImageReferences( $path, $versionNo, $fieldId )
+    public function removeImageReferences( $path, $fieldId )
     {
         $connection = $this->getConnection();
 

@@ -52,7 +52,7 @@ abstract class Gateway extends StorageGateway
      *
      * @return void
      */
-    abstract public function removeImageReferences( $path, $versionNo, $fieldId );
+    abstract public function removeImageReferences( $path, $fieldId );
 
     /**
      * Returns the number of recorded references to the given $path
