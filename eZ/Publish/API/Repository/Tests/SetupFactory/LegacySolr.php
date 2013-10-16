@@ -243,11 +243,67 @@ class LegacySolr extends Legacy
         $stmt->execute();
 
         $searchHandler->purgeIndex();
+
+        /**
+         * Reflect lots of things in Search Handler to be able to index several documents at the same time and
+         * to make sure commit is done at the end
+         */
+        $mapContentFunction = new \ReflectionMethod( $searchHandler, 'mapContent' );
+        $mapContentFunction->setAccessible( true );
+
+        $searchGatewayProperty = new \ReflectionProperty( $searchHandler, 'gateway' );
+        $searchGatewayProperty->setAccessible( true );
+        /** @var \eZ\Publish\Core\Persistence\Solr\Content\Search\Gateway $searchGateway */
+        $searchGateway = $searchGatewayProperty->getValue( $searchHandler );
+
+        $createUpdateFunction = new \ReflectionMethod( $searchGateway, 'createUpdate' );
+        $createUpdateFunction->setAccessible( true );
+
+        $clientProperty = new \ReflectionProperty( $searchGateway, 'client' );
+        $clientProperty->setAccessible( true );
+        $httpClient = $clientProperty->getValue( $searchGateway );
+
+        $solrDoc = array();
         while ( $row = $stmt->fetch( \PDO::FETCH_ASSOC ) )
         {
-            $searchHandler->indexContent(
-                $cachePersistenceHandler->contentHandler()->load( $row['id'], $row['current_version'] )
-            );
+            // send on every 10 document to not have to large documents, but do it first to get commit at the end
+            if ( isset( $solrDoc[10] ) )
+            {
+                $this->solrUpdate( $httpClient, implode( '', $solrDoc ), false );
+                $solrDoc = array();
+            }
+
+            $content = $cachePersistenceHandler->contentHandler()->load( $row['id'], $row['current_version'] );
+            $fields = $mapContentFunction->invoke( $searchHandler, $content );
+            $solrDoc[] = $createUpdateFunction->invoke( $searchGateway, $fields );
+        }
+
+        // Do final update and commit
+        $this->solrUpdate( $httpClient, implode( '', $solrDoc ), true );
+    }
+
+    /**
+     * @param Search\Gateway\HttpClient $client
+     * @param $solrDoc
+     * @param bool $commit
+     * @throws \RuntimeException
+     */
+    protected function solrUpdate( Search\Gateway\HttpClient $client, $solrDoc, $commit = true )
+    {
+        $result = $client->request(
+            'POST',
+            '/solr/update?' . ( $commit ? 'commit=true&' : '' ) . 'wt=json',
+            new Search\Gateway\Message(
+                array(
+                    'Content-Type: text/xml',
+                ),
+                $solrDoc
+            )
+        );
+
+        if ( $result->headers["status"] !== 200 )
+        {
+            throw new \RuntimeException( "Wrong HTTP status received from Solr: " . $result->headers["status"] );
         }
     }
 }
