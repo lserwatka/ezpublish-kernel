@@ -359,14 +359,23 @@ class Native extends Gateway
      * Create document update XML
      *
      * @param array $document
+     * @param \XmlWriter $continuesXmlWriter
      *
      * @return string
      */
-    protected function createUpdate( array $document )
+    protected function createUpdate( array $document, \XmlWriter $continuesXmlWriter = null )
     {
-        $xml = new \XmlWriter();
-        $xml->openMemory();
-        $xml->startElement( 'add' );
+        if ( $continuesXmlWriter === null )
+        {
+            $xml = new \XmlWriter();
+            $xml->openMemory();
+            $xml->startElement( 'add' );
+        }
+        else
+        {
+            $xml = $continuesXmlWriter;
+        }
+
         $xml->startElement( 'doc' );
 
         foreach ( $document as $field )
@@ -384,8 +393,11 @@ class Native extends Gateway
         }
 
         $xml->endElement();
-        $xml->endElement();
 
-        return $xml->outputMemory( true );
+        if ( $continuesXmlWriter === null )
+        {
+            $xml->endElement();
+            return $xml->outputMemory( true );
+        }
     }
 }

@@ -263,23 +263,30 @@ class LegacySolr extends Legacy
         $clientProperty->setAccessible( true );
         $httpClient = $clientProperty->getValue( $searchGateway );
 
-        $solrDoc = array();
+        $i = 0;
+        $xml = new \XmlWriter();
+        $xml->openMemory();
+        $xml->startElement( 'add' );
         while ( $row = $stmt->fetch( \PDO::FETCH_ASSOC ) )
         {
             // send on every 10 document to not have to large documents, but do it first to get commit at the end
-            if ( isset( $solrDoc[10] ) )
+            if ( $i !== 0 && ( $i % 20 ) === 0 )
             {
-                $this->solrUpdate( $httpClient, implode( '', $solrDoc ), false );
-                $solrDoc = array();
+                $xml->endElement();
+                $this->solrUpdate( $httpClient, $xml->outputMemory( true ), false );
+                $xml = new \XmlWriter();
+                $xml->openMemory();
+                $xml->startElement( 'add' );
             }
 
             $content = $cachePersistenceHandler->contentHandler()->load( $row['id'], $row['current_version'] );
             $fields = $mapContentFunction->invoke( $searchHandler, $content );
-            $solrDoc[] = $createUpdateFunction->invoke( $searchGateway, $fields );
+            $createUpdateFunction->invoke( $searchGateway, $fields, $xml );
+            $i++;
         }
-
         // Do final update and commit
-        $this->solrUpdate( $httpClient, implode( '', $solrDoc ), true );
+        $xml->endElement();
+        $this->solrUpdate( $httpClient, $xml->outputMemory( true ), true );
     }
 
     /**
