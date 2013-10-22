@@ -148,6 +148,26 @@ class BaseNonRedundantFieldSetTest extends BaseTest
         return $content;
     }
 
+    protected function createMultilingualTestContent()
+    {
+        $fieldValues = array(
+            "field1" => array( "eng-US" => "value 1" ),
+            "field2" => array( "eng-US" => "value 2" ),
+            "field3" => array(
+                "eng-US" => "value 3",
+                "eng-GB" => "value 3 eng-GB"
+            ),
+            "field4" => array(
+                "eng-US" => "value 4",
+                "eng-GB" => "value 4 eng-GB"
+            )
+        );
+
+        $content = $this->createTestContent( "eng-US", $fieldValues );
+
+        return $content;
+    }
+
     protected function createTestContentForUpdate()
     {
         $fieldValues = array(
